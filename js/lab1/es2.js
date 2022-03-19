@@ -1,6 +1,17 @@
 "use strict";
 
 const dayjs = require('dayjs');
+const sqlite = require("sqlite3");
+
+const db = new sqlite.Database("../lab2/films.db",
+    (err) => { if (err) throw err; });
+
+const localizedFormat = require('dayjs/plugin/localizedFormat');
+dayjs.extend(localizedFormat); // use shortcuts 'LL' for date in U.S. format
+/* locale
+  const locale_it = require('dayjs/locale/it');
+  dayjs.locale('it');
+*/
 
 function Film(id, title, favorites, date, rating){
     this.id = id;
@@ -76,8 +87,6 @@ function FilmLibrary(){
         return movies;
     }
 
-    
-
 }
 
 let l1 = new FilmLibrary();
@@ -85,4 +94,71 @@ l1.addNewFilm(f1);
 l1.addNewFilm(f2);
 l1.addNewFilm(f3);
 l1.addNewFilm(f4);
-l1.getRated();
+
+async function getAllDBFilms() {
+    let result = [];
+    return new Promise( (resolve, reject) => {
+        db.all('select * from films',
+            (err, rows) => {
+                for(let row of rows){
+                const film = new Film(row.id, row.title, row.favorite, row.watchdate, row.rating);
+                result.push(film);
+                } 
+                if(err)
+                    reject(err);
+                else{
+                    resolve(result);
+                }
+            }) ;            
+    }) ;
+}
+
+async function getAllDBFavorites() {
+    let result = [];
+    return new Promise( (resolve, reject) => {
+        db.all('select * from films where favorite == 1',
+            (err, rows) => {
+                for(let row of rows){
+                const film = new Film(row.id, row.title, row.favorite, row.watchdate, row.rating);
+                result.push(film);
+                } 
+                if(err)
+                    reject(err);
+                else{
+                    resolve(result);
+                }
+            }) ;            
+    }) ;
+}
+
+async function getAllDBWatchedToday() {
+    let result = [];
+    return new Promise( (resolve, reject) => {
+        db.all('select * from films',
+            (err, rows) => {
+                console.log(dayjs(rows[1].watchdate).diff(dayjs(), "minutes"));
+                for(let row of rows){
+                if(dayjs(row.date).diff(dayjs(), "day")){
+                    const film = new Film(row.id, row.title, row.favorite, row.watchdate, row.rating);
+                    result.push(film);
+                }
+                } 
+                if(err)
+                    reject(err);
+                else{
+                    resolve(result);
+                }
+            }) ;            
+    }) ;
+}
+  
+  
+  
+async function dbTest(){
+  
+    let result = await getAllDBWatchedToday();
+    //l1.print(undefined, result);
+  
+}
+
+  dbTest();
