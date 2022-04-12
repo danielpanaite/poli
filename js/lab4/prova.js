@@ -21,7 +21,7 @@ function Film(id, title, isFavorite = false, watchDate = '', rating = 0) {
     this._formatRating = () => {
       return this.rating ? this.rating : '<not assigned>';
     }
-  }
+}
   
 function FilmLibrary() {
     this.list = [];
@@ -88,21 +88,41 @@ library.addNewFilm(f3);
 library.addNewFilm(f4);
 library.addNewFilm(f5);
 
-const table = document.querySelector('tbody');
-table.innerHTML = ``;
-const row = document.createElement('tr');
-row.innerHTML=`<th>Title</th>
-    <th>Favourite</th>
-    <th>Watch Date</th>
-    <th>Rating</th>`;
-table.appendChild(row);
-const films = library.sortByDate();
+var filmtable = document.getElementById("filmtable");
+filmtable.innerHTML = "";
+var row = document.createElement("tr");
+var title = document.createElement("th");
+filmtable.appendChild(row);
 
-for(const f of films){
-    const newrow = document.createElement('tr');
-    newrow.innerHTML = `<td>${f.title}</td>
-        <td>${f.favorite}</td>
-        <td>${f.watchDate}</td>
-        <td>${f.rating}</td>`;
-    table.appendChild(newrow);
-} 
+var th = [];
+for(let i = 0; i<4; i++){
+    th[i] = document.createElement("th");
+}
+th[0].innerHTML = "Title";
+th[1].innerHTML = "Favorite";
+th[2].innerHTML = "Watch date";
+th[3].innerHTML = "Rating";
+for(let i = 0; i<4; i++){
+    filmtable.lastChild.appendChild(th[i]);
+}
+var films = library.sortByDate();
+for(let f of films){
+    row = document.createElement("tr");
+    filmtable.appendChild(row);
+    var t1 = document.createElement("td");
+    var i1 = document.createElement("input");
+    var t2 = document.createElement("td");
+    var t3 = document.createElement("td");
+    var t4 = document.createElement("td");
+    t1.innerHTML = f.title;
+    i1.classList.add("form-check-input");
+    i1.setAttribute("type", "checkbox");
+    i1.setAttribute("id", "flexCheckChecked");
+    t2.appendChild(i1);
+    t3.innerHTML = f.watchDate;
+    t4.innerHTML = f.rating;
+    filmtable.lastChild.appendChild(t1);
+    filmtable.lastChild.appendChild(t2);
+    filmtable.lastChild.appendChild(t3);
+    filmtable.lastChild.appendChild(t4);
+}
