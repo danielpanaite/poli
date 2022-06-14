@@ -1,0 +1,35 @@
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::net::{TcpStream, TcpListener};
+
+pub fn start_server() -> std::io::Result<()> {
+
+    let listener = TcpListener::bind("127.0.0.1:34254")?;
+
+    for stream in listener.incoming(){
+        match stream{
+            Ok(stream) => {
+                let res = handle_connection(stream);
+                //if res.is_error() { println!("Connection failed: {:?}", res); }
+            }
+            Err(e) => { println!("Accept failed: {:?}", e); }
+        }
+    }
+
+    Ok(())
+}
+
+fn handle_connection(stream: TcpStream) -> std::io::Result<()> {
+
+    let mut br: BufReader<&TcpStream> = BufReader::new(&stream);
+    let mut bw: BufWriter<&TcpStream> = BufWriter::new(&stream);
+    let mut s = String::new();
+    loop{
+        let size = br.read_line(&mut s)?;
+        if size == 0 { return Ok(()); }
+
+        bw.write(s.as_bytes())?;
+        bw.flush();
+        s.clear();
+    }
+    
+}
