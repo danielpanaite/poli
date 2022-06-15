@@ -8,8 +8,7 @@ pub fn start_server() -> std::io::Result<()> {
     for stream in listener.incoming(){
         match stream{
             Ok(stream) => {
-                let res = handle_connection(stream);
-                //if res.is_error() { println!("Connection failed: {:?}", res); }
+                handle_connection(stream).unwrap();
             }
             Err(e) => { println!("Accept failed: {:?}", e); }
         }
@@ -28,7 +27,7 @@ fn handle_connection(stream: TcpStream) -> std::io::Result<()> {
         if size == 0 { return Ok(()); }
 
         bw.write(s.as_bytes())?;
-        bw.flush();
+        bw.flush().unwrap();
         s.clear();
     }
     
